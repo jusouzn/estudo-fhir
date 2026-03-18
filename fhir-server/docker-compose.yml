@@ -1,20 +1,16 @@
-version: '3.8'
-
 services:
-  # 1. O Banco de Dados (PostgreSQL)
-  meu-banco-postgres:
+  meu-banco-postgres: # 2 espaços de recuo
     image: postgres:14-alpine
     environment:
       - POSTGRES_DB=banco_fhir
       - POSTGRES_USER=usuario_fhir
       - POSTGRES_PASSWORD=senha_secreta
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_dados:/var/lib/postgresql/data
 
-  # 2. O Servidor HAPI FHIR (O Cérebro)
-  meu-servidor-hapi:
+  meu-servidor-hapi: # 2 espaços de recuo (IGUAL ao banco acima)
     image: hapiproject/hapi:latest
     ports:
       - "8080:8080"
@@ -22,9 +18,9 @@ services:
       - spring.datasource.url=jdbc:postgresql://meu-banco-postgres:5432/banco_fhir
       - spring.datasource.username=usuario_fhir
       - spring.datasource.password=senha_secreta
+      - spring.datasource.driver-class-name=org.postgresql.Driver
       - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-      # Configuração para facilitar o teste inicial
-      - hapi.fhir.tester.home.server_address=http://localhost:8080/fhir
+      - spring.profiles.active=postgres
     depends_on:
       - meu-banco-postgres
 

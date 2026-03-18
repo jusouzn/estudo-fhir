@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cadastro FHIR</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Cadastrar Novo Paciente (FHIR)</h2>
+        </div>
+        <div class="card-body">
+            <form action="/cadastrar" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Nome Completo:</label>
+                    <input type="text" name="nome" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">CPF (Conforme seu IG):</label>
+                    <input type="text" name="cpf" class="form-control" placeholder="000.000.000-00" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Enviar para o HAPI FHIR</button>
+            </form>
+        </div>
+    </div>
+    
+    <div th:if="${mensagem}" class="alert alert-info mt-4" th:text="${mensagem}"></div>
+</body>
+</html>

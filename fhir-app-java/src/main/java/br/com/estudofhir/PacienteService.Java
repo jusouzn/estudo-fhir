@@ -2,34 +2,49 @@ package br.com.estudofhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Identifier;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PacienteService {
 
-    public String cadastrarPaciente(String nome, String cpf) {
-        // 1. Inicializa o contexto FHIR R4
+    private final IGenericClient client;
+
+    public PacienteService() {
         FhirContext ctx = FhirContext.forR4();
+        this.client = ctx.newRestfulGenericClient("http://localhost:8080/fhir");
+    }
 
-        // 2. Cria o cliente para falar com o seu servidor Docker
-        IGenericClient client = ctx.newRestfulGenericClient("http://localhost:8080/fhir");
+    public String cadastrarPaciente(String nome, String cpf) {
+        try {
+            Patient paciente = new Patient();
+            // Vincula ao seu Perfil do IG
+            paciente.getMeta().addProfile("http://estudofhir.com.br/StructureDefinition/paciente-br");
+            
+            paciente.addName().addGiven(nome);
+            paciente.addIdentifier().setSystem("https://gov.br/cpf").setValue(cpf);
 
-        // 3. Cria o objeto Paciente (R4)
-        Patient paciente = new Patient();
-        paciente.addName().addGiven(nome);
+            client.create().resource(paciente).execute();
+            return "Paciente " + nome + " cadastrado com sucesso!";
+        } catch (Exception e) {
+            return "Erro ao cadastrar: " + e.getMessage();
+        }
+    }
 
-        // 4. Adiciona o CPF (Identificador)
-        // No seu IG, você definiu que o sistema do CPF é algo como http://estudofhir.com.br/sid/cpf
-        Identifier id = new Identifier();
-        id.setSystem("http://estudofhir.com.br/sid/cpf");
-        id.setValue(cpf);
-        paciente.addIdentifier(id);
+    public List<Patient> buscarTodos() {
+        // Faz a busca (Search) por todos os pacientes
+        Bundle bundle = client.search()
+                .forResource(Patient.class)
+                .returnBundle(Bundle.class)
+                .execute();
 
-        // 5. Envia para o servidor HAPI FHIR (que salva no Postgres)
-        client.create().resource(paciente).execute();
-
-        return "Paciente " + nome + " enviado com sucesso para o HAPI FHIR!";
+        // Converte os resultados do Bundle para uma lista simples de Patient
+        return bundle.getEntry().stream()
+                .map(entry -> (Patient) entry.getResource())
+                .collect(Collectors.toList());
     }
 }

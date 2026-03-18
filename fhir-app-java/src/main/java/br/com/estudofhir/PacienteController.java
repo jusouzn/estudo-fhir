@@ -1,9 +1,10 @@
 package br.com.estudofhir;
-
+import org.hl7.fhir.r4.model.Patient;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api")
+@Controller 
 public class PacienteController {
 
     private final PacienteService service;
@@ -12,8 +13,22 @@ public class PacienteController {
         this.service = service;
     }
 
-    @GetMapping("/testar")
-    public String testar(@RequestParam String nome, @RequestParam String cpf) {
-        return service.cadastrarPaciente(nome, cpf);
+    @GetMapping("/")
+    public String index() {
+        return "index";
+    }
+
+    @PostMapping("/cadastrar")
+    public String cadastrar(@RequestParam String nome, @RequestParam String cpf, Model model) {
+        String resultado = service.cadastrarPaciente(nome, cpf);
+        model.addAttribute("mensagem", resultado);
+        return "index";
+    }
+    @GetMapping("/listar")
+    public String listar(Model model) {
+        // Busca todos os pacientes no HAPI
+        java.util.List<Patient> pacientes = service.buscarTodos(); 
+        model.addAttribute("pacientes", pacientes);
+        return "lista";
     }
 }
