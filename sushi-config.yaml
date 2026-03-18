@@ -1,0 +1,10 @@
+id: br.com.estudofhir
+canonical: http://estudofhir.com.br
+name: EstudoFHIR
+title: "Estudo FHIR"
+status: draft
+version: 0.1.0
+fhirVersion: 4.0.1
+copyrightYear: 2026+
+releaseLabel: ci-build
+menu: menu.xml

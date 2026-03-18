@@ -1,0 +1,10 @@
+# Ignorar arquivos e pastas geradas pelo SUSHI e Publisher
+output/
+temp/
+template/
+input-cache/
+fsh-generated/
+txCache/
+
+# Ignorar o programa pesado do Java
+publisher.jar
